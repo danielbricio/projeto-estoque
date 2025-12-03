@@ -82,44 +82,45 @@
 
     <script>
         async function fazerLogin() {
+            // Captura as credenciais e a opção de criptografia da interface.
             const usuario = document.getElementById('usuario').value;
             const senha = document.getElementById('senha').value;
             const usarCriptografia = document.getElementById('usarCriptografia').checked;
             const btn = document.getElementById('btnLogin');
             const msgErro = document.getElementById('msgErro');
 
-            // Efeito visual de carregando
+            // Atualiza a UI para indicar o estado de carregamento.
             btn.innerText = "Verificando...";
             btn.disabled = true;
             msgErro.style.display = "none";
 
             try {
-                // 1. Envia a requisição para o servidor Node.js
+                // Envia os dados de autenticação para o endpoint de login do backend.
                 const res = await fetch('http://localhost:3000/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ usuario, senha, usarCriptografia })
                 });
 
+                // Valida se a resposta da requisição HTTP foi bem-sucedida.
                 if (!res.ok) {
-                    // Se a resposta HTTP não for de sucesso (ex: 404, 500), lança um erro
                     throw new Error(`Erro na requisição: ${res.statusText}`);
                 }
 
-                // 2. Pega a resposta em formato JSON
+                // Converte a resposta do servidor para o formato JSON.
                 const retorno = await res.json();
                 console.log("Resposta do Login:", retorno);
 
-                // 3. Transforma a resposta em texto para uma busca flexível
+                // Converte o objeto de resposta em uma string para facilitar a verificação de sucesso.
                 const respostaTexto = JSON.stringify(retorno).toLowerCase();
 
-                // 4. NOVA LÓGICA DE SUCESSO: Verifica se contém "sucesso", "efetuado" ou o código "c005"
+                // Verifica a presença de termos de sucesso na resposta da API.
                 if (respostaTexto.includes("sucesso") || respostaTexto.includes("efetuado") || respostaTexto.includes("c005")) { 
-                    // SUCESSO! Salva o status do login no navegador e redireciona.
+                    // Em caso de sucesso, armazena o estado de autenticado e redireciona para a página principal.
                     localStorage.setItem('usuarioLogado', 'true');
                     window.location.href = "index.html"; 
                 } else {
-                    // ERRO: Mostra a mensagem de erro retornada pela API
+                    // Em caso de falha, exibe a mensagem de erro retornada pela API na interface.
                     const textoErro = "Erro: " + (retorno.msg || JSON.stringify(retorno));
                     msgErro.innerHTML = `<span class="material-icons" style="margin-right: 8px;">error</span> ${textoErro}`;
                     msgErro.style.display = "flex";
@@ -131,6 +132,7 @@
                 msgErro.style.display = "flex";
 
             } finally {
+                // Restaura o estado original do botão de login, independentemente do resultado.
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
             }

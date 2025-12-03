@@ -187,20 +187,24 @@ function alterarFormaPagamento() {
 }
 
 async function confirmarPagamento() {
+    // Coleta e valida os dados de pagamento inseridos no formulário.
     const tipo = document.getElementById('tipo-pagamento').value;
     const cpf = document.getElementById('pag-cpf').value;
     const ncartao = document.getElementById('pag-cartao').value;
     const valor = document.getElementById('pag-valor-produto').value;
     const nomeComprador = "Aluno Teste"; 
 
+    // Realiza a validação de campos obrigatórios (CPF e Cartão).
     if(!cpf) { alert('Por favor, digite o CPF!'); return; }
     if(tipo === 'CARTAO' && !ncartao) { alert('Digite o numero do cartao!'); return; }
 
     const areaResultado = document.getElementById('area-resultado');
+    // Atualiza a interface do usuário para indicar o início do processamento.
     areaResultado.innerHTML = '<p style="color: blue">Processando...</p>';
     areaResultado.style.display = 'block';
 
     try {
+        // Envia os dados de pagamento de forma assíncrona para o endpoint do backend.
         const res = await fetch('http://localhost:3000/api/pagamento', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -216,6 +220,7 @@ async function confirmarPagamento() {
         const dados = await res.json();
 
         if (dados.status === 'sucesso') {
+            // Manipula o DOM para renderizar dinamicamente o comprovante conforme o método de pagamento.
             if (dados.modo === 'PIX') {
                 areaResultado.innerHTML = `
                     <h4 style="color:green">PIX Gerado!</h4>
@@ -227,8 +232,7 @@ async function confirmarPagamento() {
                     </p>
                 `;
             } else if (dados.modo === 'CARTAO') {
-                // VISUAL DE RECIBO DE MAQUININHA 🧾
-                // Formata a data atual
+                // Renderiza um recibo visual simulado para a transação de cartão.
                 const dataHoje = new Date().toLocaleString('pt-BR');
                 
                 areaResultado.innerHTML = `
@@ -249,7 +253,7 @@ async function confirmarPagamento() {
                 `;
 
             } else if (dados.modo === 'BOLETO') {
-                // VISUAL DE CÓDIGO DE BARRAS barcode
+                // Renderiza a interface para exibição do código de barras do boleto.
                 areaResultado.innerHTML = `
                     <h4 style="color:#004085; margin-bottom: 10px;">📄 Boleto Gerado</h4>
                     <p style="font-size: 12px; color: #666;">Use o código abaixo para pagar no seu banco:</p>
@@ -266,6 +270,7 @@ async function confirmarPagamento() {
                 `;
             }
         } else {
+            // Exibe a mensagem de erro retornada pela API em caso de falha.
             areaResultado.innerHTML = `<p style="color: red">Erro: ${dados.error}</p>`;
         }
 

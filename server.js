@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const axios = require('axios');
 const QRCode = require('qrcode');
-// --- MÓDULO DE CRIPTOGRAFIA (NOVIDADE) ---
 const crypto = require('crypto');
 
 const app = express();
@@ -59,12 +58,16 @@ app.delete('/api/produtos/:id', (req, res) => {
     });
 });
 
-// --- ROTA DE PAGAMENTO (MANTIDA) ---
+// --- ROTA DE PAGAMENTO  ---
 app.post('/api/pagamento', async (req, res) => {
     const { nome, cpf, ncartao, valor, tipopag } = req.body;
-    console.log(`💳 Processando: ${tipopag} | Valor: ${valor}`);
+    
+    console.log("\n==================================================");
+    console.log(`💳 INICIANDO PAGAMENTO: ${tipopag}`);
+    console.log(`👤 Cliente: ${nome} | CPF: ${cpf} | Valor: R$ ${valor}`);
 
     try {
+        // Converte o JSON para o formato x-www-form-urlencoded, requerido pela API de pagamento.
         const params = new URLSearchParams();
         params.append('nome', nome);
         params.append('cpf', cpf);
@@ -72,11 +75,16 @@ app.post('/api/pagamento', async (req, res) => {
         params.append('valor', valor);
         params.append('tipopag', tipopag);
 
+        // Realiza a chamada POST para o endpoint externo do gateway de pagamento.
         const response = await axios.post('http://www.datse.com.br/dev/syncpix.php', params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
         const dadosAPI = response.data;
+
+        console.log("RESPOSTA DA API");
+        console.log(JSON.stringify(dadosAPI, null, 2)); // O "2" deixa bonito com indentação
+        console.log("==================================================\n");
         
         let respostaFinal = {
             status: 'sucesso',
@@ -84,11 +92,14 @@ app.post('/api/pagamento', async (req, res) => {
             modo: dadosAPI.modo
         };
 
+        // Trata a resposta da API com base no método de pagamento.
         if (dadosAPI.modo === 'PIX') {
+            // Para PIX, gera uma imagem QR Code (Base64) a partir do payload retornado.
             const imagemGerada = await QRCode.toDataURL(dadosAPI.id);
             respostaFinal.imagem = imagemGerada;
             respostaFinal.codigo = dadosAPI.id;
         } else {
+            // Para Cartão/Boleto, repassa o ID da transação retornado pelo gateway.
             respostaFinal.detalhes = dadosAPI.id; 
         }
         res.json(respostaFinal);
@@ -99,42 +110,46 @@ app.post('/api/pagamento', async (req, res) => {
     }
 });
 
-// --- ROTA DE LOGIN (TRABALHO 2 - NOVIDADE) ---
+// --- ROTA DE LOGIN ---
 app.post('/api/login', async (req, res) => {
     const { usuario, senha, usarCriptografia } = req.body;
     let senhaFinal = senha;
-    let urlAlvo = 'http://www.datse.com.br/dev/syncjava.php'; // URL Padrão
+    let urlAlvo = 'http://www.datse.com.br/dev/syncjava.php'; 
 
-    console.log(`🔐 Tentativa de Login: ${usuario} | Cripto: ${usarCriptografia}`);
+    console.log("\n==================================================");
+    console.log(`🔐 TENTATIVA DE LOGIN: ${usuario}`);
+    console.log(`⚙️  Modo Criptografia: ${usarCriptografia ? 'ATIVADO (AES)' : 'DESATIVADO'}`);
 
     try {
-        // Se o usuário marcou o checkbox, usamos a rota 2 e criptografamos
+        // Se a criptografia estiver ativa, a senha é processada antes do envio.
         if (usarCriptografia) {
-            urlAlvo = 'http://www.datse.com.br/dev/syncjava2.php'; //
+            urlAlvo = 'http://www.datse.com.br/dev/syncjava2.php'; 
             
-            // Lógica de Criptografia AES (Igual ao Java do Professor)
-            // Chave: "1234567890123456"
             const key = '1234567890123456'; 
+            // Utiliza o módulo 'crypto' para criar uma cifra AES-128-ECB.
             const cipher = crypto.createCipheriv('aes-128-ecb', key, null);
             let encrypted = cipher.update(senha, 'utf8', 'base64');
             encrypted += cipher.final('base64');
             
             senhaFinal = encrypted;
-            console.log(`🔑 Senha Criptografada: ${senhaFinal}`);
+            console.log(`🔑 Senha Criptografada (Enviada): ${senhaFinal}`);
         }
 
-        // Envia para a API do Professor
+        // Prepara os dados para envio no formato x-www-form-urlencoded.
         const params = new URLSearchParams();
-        params.append('usuario', usuario); //
-        params.append('senha', senhaFinal); //
+        params.append('usuario', usuario);
+        params.append('senha', senhaFinal);
 
+        // Envia a requisição de login para a API de autenticação.
         const response = await axios.post(urlAlvo, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
-        // Retorna a resposta da API do professor para o nosso frontend
-        // O Java apenas exibia o texto retornado no 'tretorno'
-        console.log("Resposta da API Login:", response.data);
+        console.log("RESPOSTA DA API:");
+        // Imprime o objeto inteiro que veio da API
+        console.log(response.data); 
+        console.log("==================================================\n");
+
         res.json(response.data);
 
     } catch (error) {
