@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Estoque&Cia</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Estilos exclusivos para a tela de Login */
+        body.login-page {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .login-logo {
+            font-size: 60px;
+            color: #1a237e;
+            margin-bottom: 10px;
+        }
+        .login-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        /* Estilo do Checkbox moderno */
+        .switch-container input[type="checkbox"] {
+            transform: scale(1.5);
+            margin: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <span class="material-icons login-logo">inventory_2</span>
+        <h2 class="login-title">Estoque&Cia</h2>
+
+        <div class="input-group mb-2" style="margin-bottom: 15px; text-align: left;">
+            <label>Usuário</label>
+            <input type="text" id="usuario" placeholder="Digite seu usuário">
+        </div>
+
+        <div class="input-group mb-2" style="margin-bottom: 20px; text-align: left;">
+            <label>Senha</label>
+            <input type="password" id="senha" placeholder="Digite sua senha">
+        </div>
+
+        <div class="switch-container">
+            <input type="checkbox" id="usarCriptografia">
+            <label for="usarCriptografia">Usar Criptografia (AES)</label>
+        </div>
+
+        <button onclick="fazerLogin()" class="btn-salvar" id="btnLogin">
+            ENTRAR
+        </button>
+
+        <div id="msgErro" class="error-box" style="display: none; align-items: center; justify-content: center;"></div>
+    </div>
+
+    <script>
+        async function fazerLogin() {
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            const usarCriptografia = document.getElementById('usarCriptografia').checked;
+            const btn = document.getElementById('btnLogin');
+            const msgErro = document.getElementById('msgErro');
+
+            // Efeito visual de carregando
+            btn.innerText = "Verificando...";
+            btn.disabled = true;
+            msgErro.style.display = "none";
+
+            try {
+                // 1. Envia a requisição para o servidor Node.js
+                const res = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, senha, usarCriptografia })
+                });
+
+                if (!res.ok) {
+                    // Se a resposta HTTP não for de sucesso (ex: 404, 500), lança um erro
+                    throw new Error(`Erro na requisição: ${res.statusText}`);
+                }
+
+                // 2. Pega a resposta em formato JSON
+                const retorno = await res.json();
+                console.log("Resposta do Login:", retorno);
+
+                // 3. Transforma a resposta em texto para uma busca flexível
+                const respostaTexto = JSON.stringify(retorno).toLowerCase();
+
+                // 4. NOVA LÓGICA DE SUCESSO: Verifica se contém "sucesso", "efetuado" ou o código "c005"
+                if (respostaTexto.includes("sucesso") || respostaTexto.includes("efetuado") || respostaTexto.includes("c005")) { 
+                    // SUCESSO! Salva o status do login no navegador e redireciona.
+                    localStorage.setItem('usuarioLogado', 'true');
+                    window.location.href = "index.html"; 
+                } else {
+                    // ERRO: Mostra a mensagem de erro retornada pela API
+                    const textoErro = "Erro: " + (retorno.msg || JSON.stringify(retorno));
+                    msgErro.innerHTML = `<span class="material-icons" style="margin-right: 8px;">error</span> ${textoErro}`;
+                    msgErro.style.display = "flex";
+                }
+
+            } catch (erro) {
+                console.error(erro);
+                msgErro.innerHTML = `<span class="material-icons" style="margin-right: 8px;">error</span> Erro ao conectar com o servidor.`;
+                msgErro.style.display = "flex";
+
+            } finally {
+                btn.innerText = "ENTRAR";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

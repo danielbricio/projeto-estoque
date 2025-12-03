@@ -1,0 +1,235 @@
+/* Reset básico */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body {
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+/* Container Principal */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Cabeçalho */
+header {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%); /* Azul Profissional */
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+/* Cards (Caixas brancas) */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.mt-20 { margin-top: 20px; }
+
+h2 {
+    color: #1a237e;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Grid do Formulário */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas */
+    gap: 20px;
+}
+
+.full-width { grid-column: span 2; } /* Ocupa a linha toda */
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #1a237e;
+    outline: none;
+}
+
+/* Botão Salvar */
+.btn-salvar {
+    background-color: #2e7d32; /* Verde Sucesso */
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.btn-salvar:hover { background-color: #1b5e20; }
+
+/* Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th {
+    background-color: #1a237e;
+    color: white;
+    text-align: left;
+    padding: 12px;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover { background-color: #f5f5f5; }
+
+/* Botão Excluir */
+.btn-delete {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-delete:hover { background-color: #b71c1c; }
+
+/* --- Estilos do Modal de Pagamento --- */
+/* --- Estilos do Modal de Pagamento (Visual Novo) --- */
+
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Fundo um pouco mais escuro para destaque */
+    backdrop-filter: blur(3px); /* Efeito de desfoque no fundo (moderno) */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px; /* Aumentado de 25px para 40px (mais respiro) */
+    border-radius: 15px; /* Bordas mais arredondadas */
+    width: 95%; 
+    max-width: 500px; /* Aumentado de 400px para 500px (mais largo) */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* Sombra mais profunda */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaço automático entre elementos soltos */
+}
+
+/* Cabeçalho do Modal */
+.modal-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 25px; /* Mais espaço abaixo do título */
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 15px;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: #1a237e;
+}
+
+/* Espaçamento dos Campos (Onde você pediu mais verticalidade) */
+.modal-body .input-group {
+    margin-bottom: 20px; /* Força espaço entre um campo e outro */
+}
+
+.modal-body label {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 8px; /* Afasta o rótulo do campo */
+    display: block;
+}
+
+/* Inputs mais bonitos e altos */
+.modal-body input, 
+.modal-body select {
+    width: 100%;
+    padding: 14px; /* Mais altura para digitar */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.modal-body input:focus, 
+.modal-body select:focus {
+    background-color: white;
+    border-color: #1a237e;
+    box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1); /* Brilho azul ao clicar */
+    outline: none;
+}
+
+/* Botão de Fechar (X) */
+.btn-close { 
+    background: none; border: none; font-size: 32px; 
+    cursor: pointer; color: #999; transition: color 0.2s;
+    line-height: 1;
+}
+.btn-close:hover { color: #c62828; transform: scale(1.1); }
+
+/* --- Caixa de Erro com Animação --- */
+@keyframes tremer {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+}
+
+.error-box {
+    background-color: #ffebee; /* Fundo vermelho claro */
+    color: #c62828; /* Texto vermelho escuro */
+    border: 1px solid #ef9a9a; /* Borda vermelha mais clara */
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    display: block; /* ou none, para controlar com JS */
+
+    /* Aplica a animação */
+    animation-name: tremer;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-in-out;
+}
